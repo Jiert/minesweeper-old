@@ -1,105 +1,104 @@
 
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Minesweeper</title>
+  <head>
+    <title>Minesweeper</title>
+      
+      <style>
+          
+        body {
+          font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
+          font-weight: 300;
+          color: #333;
+        }
         
-        <style>
-            
-            body {
-               font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif; 
-               font-weight: 300;
-               color: #333;
-            }
-            
-            #gameWindow {
-                float:left;
-                background: #c1c1c1;
-            }
-            
-            h1 {
-                font-size: 15px;
-                margin: 10px;
-            }
-            
-            #bombCounter,
-            #timer{
-                font-size: 20px;
-                padding: 2px;
-                width: 50px;
-                height: 30px;
-                background-color: #000;
-                color: red;
-            }
-            
-            #bombCounter{float: left;}
-            #timer{float: right;}
-            
-            
-            #game {
-                padding: 0;
-                margin: 0;
-                font-family: Consolas;
-                float: left;
-                clear: both;
-                background-color: #848284;
-            }
-            
-            #game td {
-                padding-top: 4px;
-                width: 22px;
-                height: 19px;
-                text-align: center;
-            }
-            
-            #game td span {
-                padding: 2px;
-                width: 10px;
-                height: 10px;
-            }
-            
-            #instructions {
-                float: left;
-                margin: 0 20px;
-            }
-            
-            
-            .bombBlue{color: #0000ff;}
-            .bombGreen{color: #008200;}
-            .bombRed{color: #ff0000;}
-            .bombDarkBlue{color: #000084;}
-            .bombDarkRed{color: #840000;}
-            .bombAqua{color: #008284;}
-            .bombPurpose{color: #840084;}
-            .bombBlack{color: #000;}
+        #gameWindow {
+          float:left;
+          background: #c1c1c1;
+        }
+        
+        h1 {
+          font-size: 15px;
+          margin: 10px;
+        }
+        
+        #bombCounter,
+        #timer{
+          font-size: 20px;
+          padding: 2px;
+          width: 50px;
+          height: 30px;
+          background-color: #000;
+          color: red;
+        }
+        
+        #bombCounter{float: left;}
+        #timer{float: right;}
+        
+        #game {
+          padding: 0;
+          margin: 0;
+          font-family: Consolas;
+          float: left;
+          clear: both;
+          background-color: #848284;
+        }
+        
+        #game td {
+          padding-top: 4px;
+          width: 22px;
+          height: 19px;
+          text-align: center;
+        }
+        
+        #game td span {
+          padding: 2px;
+          width: 10px;
+          height: 10px;
+        }
+        
+        #instructions {
+          float: left;
+          margin: 0 20px;
+        }
+          
+          
+        .bombBlue{color: #0000ff;}
+        .bombGreen{color: #008200;}
+        .bombRed{color: #ff0000;}
+        .bombDarkBlue{color: #000084;}
+        .bombDarkRed{color: #840000;}
+        .bombAqua{color: #008284;}
+        .bombPurpose{color: #840084;}
+        .bombBlack{color: #000;}
             
             
-            .hidden {
-                display: none;
-            }
-            
-            .unmarked {
-                background: #d4e4ef;
-                background: -moz-linear-gradient(top,  #d4e4ef 0%, #86aecc 100%); 
-                background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#d4e4ef), color-stop(100%,#86aecc));
-                background: -webkit-linear-gradient(top,  #d4e4ef 0%,#86aecc 100%); 
-                background: -o-linear-gradient(top,  #d4e4ef 0%,#86aecc 100%); 
-                background: -ms-linear-gradient(top,  #d4e4ef 0%,#86aecc 100%); 
-                background: linear-gradient(to bottom,  #d4e4ef 0%,#86aecc 100%);
-                filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d4e4ef', endColorstr='#86aecc',GradientType=0 );
-            }
-            
-            .marked {
-                background-color: #CF4D3F;  /* red */
-            }
-            
-            .clicked {
-                background: #c6c6c6;
-            }
-            
-            .suspect {
-                background-color: blue;    
-            }
+          .hidden {
+              display: none;
+          }
+          
+          .unmarked {
+              background: #d4e4ef;
+              background: -moz-linear-gradient(top,  #d4e4ef 0%, #86aecc 100%); 
+              background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#d4e4ef), color-stop(100%,#86aecc));
+              background: -webkit-linear-gradient(top,  #d4e4ef 0%,#86aecc 100%); 
+              background: -o-linear-gradient(top,  #d4e4ef 0%,#86aecc 100%); 
+              background: -ms-linear-gradient(top,  #d4e4ef 0%,#86aecc 100%); 
+              background: linear-gradient(to bottom,  #d4e4ef 0%,#86aecc 100%);
+              filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d4e4ef', endColorstr='#86aecc',GradientType=0 );
+          }
+          
+          .marked {
+              background-color: #CF4D3F;  /* red */
+          }
+          
+          .clicked {
+              background: #c6c6c6;
+          }
+          
+          .suspect {
+              background-color: blue;    
+          }
             
         </style>
         
@@ -450,7 +449,7 @@
         var bombCounter = function(n){
             var bombCount = parseInt(document.getElementById("bombCounter").innerHTML);
             document.getElementById("bombCounter").innerHTML = bombCount + n;
-        } 
+        }
     
     </script>
 </html>
