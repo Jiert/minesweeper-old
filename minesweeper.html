@@ -62,134 +62,124 @@
           margin: 0 20px;
         }
           
-          
-        .bombBlue{color: #0000ff;}
-        .bombGreen{color: #008200;}
-        .bombRed{color: #ff0000;}
-        .bombDarkBlue{color: #000084;}
-        .bombDarkRed{color: #840000;}
-        .bombAqua{color: #008284;}
-        .bombPurpose{color: #840084;}
-        .bombBlack{color: #000;}
+        .bombBlue {color: #0000ff;}
+        .bombGreen {color: #008200;}
+        .bombRed {color: #ff0000;}
+        .bombDarkBlue {color: #000084;}
+        .bombDarkRed {color: #840000;}
+        .bombAqua {color: #008284;}
+        .bombPurpose {color: #840084;}
+        .bombBlack {color: #000;}
             
+        .hidden {display: none; }
+          
+        .unmarked {
+          background: #d4e4ef;
+          background: -moz-linear-gradient(top,  #d4e4ef 0%, #86aecc 100%); 
+          background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#d4e4ef), color-stop(100%,#86aecc));
+          background: -webkit-linear-gradient(top,  #d4e4ef 0%,#86aecc 100%); 
+          background: -o-linear-gradient(top,  #d4e4ef 0%,#86aecc 100%); 
+          background: -ms-linear-gradient(top,  #d4e4ef 0%,#86aecc 100%); 
+          background: linear-gradient(to bottom,  #d4e4ef 0%,#86aecc 100%);
+          filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d4e4ef', endColorstr='#86aecc',GradientType=0 );
+        }
+          
+        .marked {background-color: #CF4D3F;  /* red */ }
+        .clicked {background: #c6c6c6; }
+        .suspect {background-color: blue; }
             
-          .hidden {
-              display: none;
-          }
-          
-          .unmarked {
-              background: #d4e4ef;
-              background: -moz-linear-gradient(top,  #d4e4ef 0%, #86aecc 100%); 
-              background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#d4e4ef), color-stop(100%,#86aecc));
-              background: -webkit-linear-gradient(top,  #d4e4ef 0%,#86aecc 100%); 
-              background: -o-linear-gradient(top,  #d4e4ef 0%,#86aecc 100%); 
-              background: -ms-linear-gradient(top,  #d4e4ef 0%,#86aecc 100%); 
-              background: linear-gradient(to bottom,  #d4e4ef 0%,#86aecc 100%);
-              filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d4e4ef', endColorstr='#86aecc',GradientType=0 );
-          }
-          
-          .marked {
-              background-color: #CF4D3F;  /* red */
-          }
-          
-          .clicked {
-              background: #c6c6c6;
-          }
-          
-          .suspect {
-              background-color: blue;    
-          }
-            
-        </style>
+      </style>
         
     </head>
     <body>
-        <div id="gameWindow">
-            <h1>Mine Sweeper</h1>
+      <div id="gameWindow">
+        <h1>Mine Sweeper</h1>
             
-            <div id="gameBox">
-                <div id="bombCounter"></div>
-                <div id="smileyFace"></div>
-                <div id="timer"></div>
-                <table id="game"></table>
-            </div>
+        <div id="gameBox">
+          <div id="bombCounter"></div>
+          <div id="smileyFace"></div>
+          <div id="timer"></div>
+          <table id="game"></table>
+        </div>
         </div>
         
         <div id="instructions">
-            <p>How to Play:</p>
-            <ul>
-                <li>Left Click to reveal squares</li>
-                <li>Right Click to mark bombs</li>
-                <li>Right Click a second time to mark a square "suspected" bomb.</li>
-                <li>Revealed numbers indicate number of adjacent bombs</li>
-                <li>Win by marking all the bombs and revealing all the squares without blowing up</li>
-            </ul>
-            <!--<a href="http://jsfiddle.net/2DZUQ/7/">jsfiddle</a>-->
-        </div>
+          <p>How to Play:</p>
+          <ul>
+            <li>Left Click to reveal squares</li>
+            <li>Right Click to mark bombs</li>
+            <li>Right Click a second time to mark a square "suspected" bomb.</li>
+            <li>Revealed numbers indicate number of adjacent bombs</li>
+            <li>Win by marking all the bombs and revealing all the squares without blowing up</li>
+          </ul>
+          <!--<a href="http://jsfiddle.net/2DZUQ/7/">jsfiddle</a>-->
+      </div>
     </body>
     
     <script>
-        //NOTES
-        //It only works right now if the board is square
-        
-        var numBombs = 10;
-        var gameWidth = 10;
-        var gameHeight = 10;
-        var bombsArray = [];
-        var bombLimits = gameWidth * gameHeight;
-        
-        //random number generator
-        var randomizer = function(n){
-            return Math.floor((Math.random() * n) + 1);
+      //NOTES
+      //It only works right now if the board is square
+      
+      var bombMap,
+          numBombs = 10,
+          gameWidth = 10,
+          gameHeight = 10,
+          bombsArray = [],
+          bombLimits = gameWidth * gameHeight;
+      
+      //random number generator
+      function randomizer(n){
+        return Math.floor((Math.random() * n) + 1);
+      }
+      
+      //generate array of Bomb numbers
+      function makeBombs(n){
+        for(var b = 1; b <= numBombs; b += 1){
+          bombsArray.push(randomizer(bombLimits));
         }
-        
-        //generate array of Bomb numbers
-        var makeBombs = function(n){
-            for(var b = 1; b <= numBombs; b += 1){
-                bombsArray.push(randomizer(bombLimits));
-            }
-        };
-        
-        //call the makeBombs function
-        makeBombs(numBombs);      
-        
-        //replace duplicates found in the bombsArray
-        var replacer = function(a){
-            var duplicate = false;
-            
-            a.sort(function(a, b){
-                return a - b;
-            })
-            
-            console.log(a);
-            
-            for (var i = 0; i < a.length; i += 1){
-                if(a[i] === a[i -1]){
-                    duplicate = true;
-                    a[i] = randomizer(bombLimits);
-                    console.log(a[i]);
-                    replacer(a);
-                }
-            }
-            console.log(duplicate);
+      };
+      
+      //call the makeBombs function
+      makeBombs(numBombs);      
+      
+      //replace duplicates found in the bombsArray
+      function replacer(a){
+        var duplicate = false;
+          
+        a.sort(function(a, b){
+          return a - b;
+        })
+          
+        // console.log(a);
+          
+        for (var i = 0; i < a.length; i += 1){
+          if(a[i] === a[i -1]){
+            duplicate = true;
+            a[i] = randomizer(bombLimits);
+            // console.log(a[i]);
+            replacer(a);
+          }
         }
-        replacer(bombsArray);        
+        // console.log(duplicate);
+      }
+      replacer(bombsArray);        
         
-        //create multidemensional array.  Had to look up how to do this
-        var bombMap = new Array(gameHeight);
-        for(var i = 0; i < gameHeight; i += 1){
-            bombMap[i] = new Array(gameWidth);
+      //create multidemensional array.  Had to look up how to do this
+      bombMap = new Array(gameHeight);
+
+      for(var i = 0; i < gameHeight; i += 1){
+        bombMap[i] = new Array(gameWidth);
+      }
+
+      //insert default values into each position in the bombMap        
+      (function(){
+        for (var y = 0; y < gameHeight; y += 1){
+          for (var x = 0; x < gameWidth; x += 1){
+            bombMap[y][x] = 0;
+          }
         }
-        
-        //insert default values into each position in the bombMap        
-        var setDefaults = (function(){
-            for (var y = 0; y < gameHeight; y += 1){
-                for (var x = 0; x < gameWidth; x += 1){
-                    bombMap[y][x] = 0;
-                }
-            }
-        })();        
-        
+      })();
+     
         //insert bombs into the multidimensional array
         var mapBombs = (function(){
             
