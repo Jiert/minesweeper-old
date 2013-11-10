@@ -167,141 +167,129 @@ for(var i = 0; i < gameHeight; i += 1){
   document.getElementById('game').innerHTML = tableCells;
 })(gameWidth, gameHeight)
          
-  //Left-Click Event Listener
-  document.getElementById("game").addEventListener('click', 
-      function(e){
-          if(e.srcElement.tagName === "TD"){
-                
-              if(timerStarted === false){
-                 timerStarted = true;
-                 gameTimer(); 
-              }
-              
-              console.log(e.srcElement);
-              //console.log(e.srcElemnt.className);
-              
-              //removeClass "unmarked" class
-              e.srcElement.className = e.srcElement.className.replace( /(?:^|\s)unmarked(?!\S)/g , '' );
+//Left-Click Event Listener
+document.getElementById("game").addEventListener('click', function(e){
+  if(e.srcElement.tagName === "TD"){
+            
+    if(timerStarted === false){
+      timerStarted = true;
+      gameTimer(); 
+    }
+        
+    //removeClass "unmarked" class
+    e.srcElement.className = e.srcElement.className.replace( /(?:^|\s)unmarked(?!\S)/g , '' );
 
-              //add the "clicked" class                   
-              e.srcElement.className += " clicked";
-              e.srcElement.children[0].className = "visable";
-              
-              //clear adjacent cells                    
-              var clearCells = (function(){
-                  if(e.srcElement.innerHTML.indexOf("&nbsp;") !== -1){                            
-                      
-                      //get the ID of the element Clicked
-                      emptySquareID = parseInt(e.srcElement.id);
-                      
-                      var counter = 1;
-                      var cellID;
-                      
-                      for (var i = 0; i < 8; i += 1){
-                          
-                          //if the element clicked on was ID === 1
-                          if (counter === 1) {        //east  //2
-                              cellID = emptySquareID + 1;
-                          } else if (counter === 2){  //southeast  //12
-                              cellID = emptySquareID + gameWidth + 1;
-                          } else if (counter === 3){  //south // 11
-                              cellID = emptySquareID + gameWidth;
-                          } else if (counter === 4){  //southwest
-                              cellID = emptySquareID + gameWidth - 1;
-                          } else if (counter === 5){  //west
-                              cellID = emptySquareID - 1;
-                          } else if (counter === 6){  //northwest
-                              cellID = emptySquareID - gameWidth - 1;    
-                          } else if (counter === 7){  //north
-                              cellID = emptySquareID - gameWidth;    
-                          } else if (counter === 8){  //northeast
-                              cellID = emptySquareID - gameWidth + 1;    
-                          }                                
-                          
-                          console.log("CellID: " + cellID);
-                          
-                          neighbor = document.getElementById(cellID);
-                                              
-                          var crossedBorder = false;
-                          
-                          
-                          //something Funny happens with cellID === 11 or 0
-                          if((cellID - 1) % gameWidth === 0 || cellID === (gameWidth + 1)){
-                              crossedBorder = true;
-                          }
-                          
-                          console.log("Crossed Boarder: " + crossedBorder);                               
-                          
-                          //if the square is related and doesn't have a bomb uncover it.
-                          if (neighbor.innerHTML.indexOf(" * ") === -1 && crossedBorder === false){
-                              console.log('ran neighbor: ');
-                              
-                              //removeClass "unmarked" class
-                              neighbor.className = neighbor.className.replace( /(?:^|\s)unmarked(?!\S)/g , '' );
-
-                              //add the "clicked" class                                       
-                              neighbor.className += " clicked";
-                              neighbor.children[0].className = "visable";
-                          }
-                          counter += 1; 
-                      }
-                      
-                  }
-              })();
-              
-              
-              //alert if bomb clicked
-              if(e.srcElement.innerHTML.indexOf("*") !== -1){
-                  alert("Game Over!");
-                  stopTimer();
-              }
+    //add the "clicked" class                   
+    e.srcElement.className += " clicked";
+    e.srcElement.children[0].className = "visable";
+        
+    //clear adjacent cells                    
+    var clearCells = (function(){
+      if(e.srcElement.innerHTML.indexOf("&nbsp;") !== -1){                            
           
+        //get the ID of the element Clicked
+        emptySquareID = parseInt(e.srcElement.id);
+        
+        var counter = 1;
+        var cellID;
+        
+        for (var i = 0; i < 8; i += 1){
+            
+          //if the element clicked on was ID === 1
+          if (counter === 1) {        //east  //2
+              cellID = emptySquareID + 1;
+          } else if (counter === 2){  //southeast  //12
+              cellID = emptySquareID + gameWidth + 1;
+          } else if (counter === 3){  //south // 11
+              cellID = emptySquareID + gameWidth;
+          } else if (counter === 4){  //southwest
+              cellID = emptySquareID + gameWidth - 1;
+          } else if (counter === 5){  //west
+              cellID = emptySquareID - 1;
+          } else if (counter === 6){  //northwest
+              cellID = emptySquareID - gameWidth - 1;    
+          } else if (counter === 7){  //north
+              cellID = emptySquareID - gameWidth;    
+          } else if (counter === 8){  //northeast
+              cellID = emptySquareID - gameWidth + 1;    
+          }                                
+          
+          console.log("CellID: " + cellID);
+          
+          neighbor = document.getElementById(cellID);
+                              
+          var crossedBorder = false;
+          
+          //something Funny happens with cellID === 11 or 0
+          if((cellID - 1) % gameWidth === 0 || cellID === (gameWidth + 1)){
+              crossedBorder = true;
           }
-      }, 
-  false);
-  
-  //Right-Click Event Listener
-  //Had to look up how to listen for the right click
-  document.getElementById("game").addEventListener('contextmenu', 
-      function(e){
-          e.preventDefault();
-                                          
-          if(e.srcElement.tagName === "TD"){
-              if (e.srcElement.className === "marked"){ 
-                  e.srcElement.className = "suspect";
-                  bombCounter(+1);
-              } else if (e.srcElement.className === "suspect") {
-                  e.srcElement.className = "unmarked";
-              } else {  //add red
-                 e.srcElement.className = "marked";
-                 bombCounter(-1);
-              }
-          }                
-          //return false;
-      }, 
-  false);
-  
-  //Game Timer
-  //Had to look this up
-  document.getElementById("timer").innerHTML = "0";
-  var gameTimer = function(){
-      var start = new Date;
-      var myTimer = document.getElementById("timer");
-      myInterval = setInterval(function() {
-          timerValue = parseInt(((new Date - start) / 1000));
-          myTimer.innerHTML = timerValue;
-      }, 1000);             
-  }
-  
-  var stopTimer = function(){
-      clearInterval(myInterval);
-  }
+            
+          console.log("Crossed Boarder: " + crossedBorder);                               
+            
+          //if the square is related and doesn't have a bomb uncover it.
+          if (neighbor.innerHTML.indexOf(" * ") === -1 && crossedBorder === false){
+            console.log('ran neighbor: ');
+            
+            //removeClass "unmarked" class
+            neighbor.className = neighbor.className.replace( /(?:^|\s)unmarked(?!\S)/g , '' );
 
-  //Bomb Count Down  THIS NEEDS WORK
-  document.getElementById("bombCounter").innerHTML = numBombs; 
-  
-  //Need to fix for the case of when a user LEFT clicks a square that is marked.
-  var bombCounter = function(n){
-      var bombCount = parseInt(document.getElementById("bombCounter").innerHTML);
-      document.getElementById("bombCounter").innerHTML = bombCount + n;
+            //add the "clicked" class                                       
+            neighbor.className += " clicked";
+            neighbor.children[0].className = "visable";
+          }
+          counter += 1; 
+        }
+                    
+      }
+    })();
+            
+    //alert if bomb clicked
+    if(e.srcElement.innerHTML.indexOf("*") !== -1){
+      alert("Game Over!");
+      stopTimer();
+    }
+        
   }
+});
+  
+//Right-Click Event Listener
+document.getElementById("game").addEventListener('contextmenu', function(e){
+  e.preventDefault();
+                                  
+  if(e.srcElement.tagName === "TD"){
+    if (e.srcElement.className === "marked"){ 
+      e.srcElement.className = "suspect";
+      bombCounter(+1);
+    } else if (e.srcElement.className === "suspect") {
+      e.srcElement.className = "unmarked";
+    } else {  //add red
+     e.srcElement.className = "marked";
+     bombCounter(-1);
+    }
+  }                
+});
+  
+//Game Timer
+document.getElementById("timer").innerHTML = "0";
+function gameTimer(){
+  var start = new Date;
+  var myTimer = document.getElementById("timer");
+  myInterval = setInterval(function() {
+    timerValue = parseInt(((new Date - start) / 1000));
+    myTimer.innerHTML = timerValue;
+  }, 1000);             
+}
+
+function stopTimer(){
+  clearInterval(myInterval);
+}
+
+//Bomb Count Down  THIS NEEDS WORK
+document.getElementById("bombCounter").innerHTML = numBombs; 
+
+//Need to fix for the case of when a user LEFT clicks a square that is marked.
+function bombCounter(n){
+  var bombCount = parseInt(document.getElementById("bombCounter").innerHTML);
+  document.getElementById("bombCounter").innerHTML = bombCount + n;
+}
