@@ -6,7 +6,12 @@ var bombMap,
     gameWidth = 10,
     gameHeight = 10,
     bombsArray = [],
-    bombLimits = gameWidth * gameHeight;
+    bombLimits = gameWidth * gameHeight,
+    myChildren,
+    neighbor,
+    emptySquareID,
+    timerStarted = false,
+    timerValue;
 
 //random number generator
 function randomizer(n){
@@ -31,18 +36,15 @@ function replacer(a){
     return a - b;
   })
     
-  // console.log(a);
-    
   for (var i = 0; i < a.length; i += 1){
     if(a[i] === a[i -1]){
       duplicate = true;
       a[i] = randomizer(bombLimits);
-      // console.log(a[i]);
       replacer(a);
     }
   }
-  // console.log(duplicate);
 }
+
 replacer(bombsArray);        
   
 //create multidemensional array.  Had to look up how to do this
@@ -61,127 +63,109 @@ for(var i = 0; i < gameHeight; i += 1){
   }
 })();
 
-  //insert bombs into the multidimensional array
-  var mapBombs = (function(){
+//insert bombs into the multidimensional array
+(function(){
+    
+  var col,
+      row;
+    
+  //Divide each member of bombsArray by the gameHeight to find out which row it needs to fall in
+  for (var b = 0; b < bombsArray.length; b += 1){
       
-      var col,
-          row;
-      
-      console.log(bombsArray);
-      
-      //Divide each member of bombsArray by the gameHeight to find out which row it needs to fall in
-      for (var b = 0; b < bombsArray.length; b += 1){
-          
-          //find column array position for the bomb
-          //If 25 => 0
-          col = (bombsArray[b] % gameWidth) - 1;
-          
-          //test for col edge case
-          if(col === -1){
-              col = gameWidth - 1;
-          }
-          
-          //find row array position for the bomb
-          //if bombsArray[b] is evenly divisible by gameheight, subtract 1
-          //if 20 / 5 = 4, we need to set it in the 4 row array position
-          row = Math.floor(bombsArray[b] / gameHeight );
-          
-          if(bombsArray[b] % gameHeight === 0){
-              row -= 1;
-          }
-                      
-          bombMap[row][col] = " * ";    
-          
-          console.log("bombsArray["+bombsArray[b]+"]");
-          console.log("Bomb " + bombsArray[b] + " should be in bombMap[" + row + "][" + col + "]");
-          
-      }
-      console.log(bombMap);
-      
-  })();        
-  
-  //add in the indicator numbers
-  var mapNumbers = function(c, r){
-      var marker;
-      for (var y = 0; y < r; y += 1){
-          for (var x = 0; x < c; x += 1){
-              
-              //if the square we're on isn't a bomb
-              if (bombMap[y][x] === 0){
-                  marker = 0;
-                  
-                  //count the number of bombs in the surrounding squares
-                  if (bombMap[y][x + 1] === " * "){marker += 1;}
-                  if (bombMap[y][x - 1] === " * "){marker += 1;}
-                  
-                  if(bombMap[y + 1] !== undefined){
-                      if (bombMap[y + 1][x] === " * "){marker += 1;}
-                      if (bombMap[y + 1][x + 1] === " * "){marker += 1;}
-                      if (bombMap[y + 1][x - 1] === " * "){marker += 1;}
-                  }
-                  
-                  if(bombMap[y - 1] !== undefined){
-                      if (bombMap[y - 1][x] === " * "){marker += 1;}
-                      if (bombMap[y - 1][x - 1] === " * "){marker += 1;}
-                      if (bombMap[y - 1][x + 1] === " * "){marker += 1;}
-                  }
-                  
-                  if(marker > 0){
-                      bombMap[y][x] = marker;
-                  } else {
-                      bombMap[y][x] = "&nbsp;";    
-                  }
-              }
-              
-          }
-      }
-  };        
-  mapNumbers(gameWidth, gameHeight);
-         
-  //game board generator
-  var drawBox = function(c, r){
-      
-      
-      
-      var tableCells = '<tr>';
-      var counter = 1;
-      var bombNumberClass;
-      for (var y = 0; y < r; y += 1){
-          for (var x = 0; x < c; x += 1){
-              if (bombMap[y][x] === 1){
-                  bombNumberClass = "bombBlue";
-              } else if (bombMap[y][x] === 2){
-                  bombNumberClass = "bombGreen";    
-              } else if (bombMap[y][x] === 3){
-                  bombNumberClass = "bombRed";    
-              } else if (bombMap[y][x] === 4){
-                  bombNumberClass = "bombDarkBlue";    
-              } else if (bombMap[y][x] === 5){
-                  bombNumberClass = "bombDarkRed";    
-              } else if (bombMap[y][x] === 6){
-                  bombNumberClass = "bombAqua";    
-              } else if (bombMap[y][x] === 7){
-                  bombNumberClass = "bombPurple";    
-              } else if (bombMap[y][x] === 8){
-                  bombNumberClass = "bombBlack";    
-              }
-              tableCells += '<td id="'+counter+'" class="unmarked '+bombNumberClass+'"><span class="hidden">'+ bombMap[y][x] +'</span></td>';
-              counter += 1;
-          }
-          tableCells += '</tr>';
-      }
-      document.getElementById('game').innerHTML = tableCells;
+    //find column array position for the bomb
+    //If 25 => 0
+    col = (bombsArray[b] % gameWidth) - 1;
+    
+    //test for col edge case
+    if(col === -1){
+      col = gameWidth - 1;
+    }
+    
+    //find row array position for the bomb
+    //if bombsArray[b] is evenly divisible by gameheight, subtract 1
+    //if 20 / 5 = 4, we need to set it in the 4 row array position
+    row = Math.floor(bombsArray[b] / gameHeight );
+    
+    if(bombsArray[b] % gameHeight === 0){
+        row -= 1;
+    }
+                
+    bombMap[row][col] = " * ";    
   }
+    
+})();        
   
-  drawBox(gameWidth, gameHeight);
-          
-  //global so I can see them
-  var myChildren;
-  var neighbor;
-  var emptySquareID;
-  var timerStarted = false;
-  var timerValue;
+// add in the indicator numbers
+// probably shouldn't do this, should add in numbers after click
+(function(c,r){
+  var marker;
+  for (var y = 0; y < r; y += 1){
+    for (var x = 0; x < c; x += 1){
+        
+      //if the square we're on isn't a bomb
+      if (bombMap[y][x] === 0){
+        marker = 0;
+        
+        //count the number of bombs in the surrounding squares
+        if (bombMap[y][x + 1] === " * "){marker += 1;}
+        if (bombMap[y][x - 1] === " * "){marker += 1;}
+        
+        if(bombMap[y + 1] !== undefined){
+          if (bombMap[y + 1][x] === " * "){marker += 1;}
+          if (bombMap[y + 1][x + 1] === " * "){marker += 1;}
+          if (bombMap[y + 1][x - 1] === " * "){marker += 1;}
+        }
+        
+        if(bombMap[y - 1] !== undefined){
+          if (bombMap[y - 1][x] === " * "){marker += 1;}
+          if (bombMap[y - 1][x - 1] === " * "){marker += 1;}
+          if (bombMap[y - 1][x + 1] === " * "){marker += 1;}
+        }
+        
+        if(marker > 0){
+          bombMap[y][x] = marker;
+        } else {
+          bombMap[y][x] = "&nbsp;";    
+        }
+      }
+        
+    }
+  }
+})(gameWidth, gameHeight);        
+         
+//game board generator
+(function(c, r){
+    
+  var tableCells = '<tr>',
+      counter = 1,
+      bombNumberClass;
   
+  for (var y = 0; y < r; y += 1){
+    for (var x = 0; x < c; x += 1){
+      if (bombMap[y][x] === 1){
+        bombNumberClass = "bombBlue";
+      } else if (bombMap[y][x] === 2){
+        bombNumberClass = "bombGreen";    
+      } else if (bombMap[y][x] === 3){
+        bombNumberClass = "bombRed";    
+      } else if (bombMap[y][x] === 4){
+        bombNumberClass = "bombDarkBlue";    
+      } else if (bombMap[y][x] === 5){
+        bombNumberClass = "bombDarkRed";    
+      } else if (bombMap[y][x] === 6){
+        bombNumberClass = "bombAqua";    
+      } else if (bombMap[y][x] === 7){
+        bombNumberClass = "bombPurple";    
+      } else if (bombMap[y][x] === 8){
+        bombNumberClass = "bombBlack";    
+      }
+      tableCells += '<td id="'+counter+'" class="unmarked '+bombNumberClass+'"><span class="hidden">'+ bombMap[y][x] +'</span></td>';
+      counter += 1;
+    }
+    tableCells += '</tr>';
+  }
+  document.getElementById('game').innerHTML = tableCells;
+})(gameWidth, gameHeight)
          
   //Left-Click Event Listener
   document.getElementById("game").addEventListener('click', 
